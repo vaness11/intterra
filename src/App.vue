@@ -11,17 +11,19 @@
 @import url("./assets/styles.less");
 @import url("./assets/reset.css");
 
+@header-height: 80px;
+
 #app {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 main {
-  height: calc(100vh - 80px);
+  height: calc(100vh - @header-height);
 }
 
 nav {
-  height: 80px;
+  height: @header-height;
   background: #091c28;
 }
 </style>

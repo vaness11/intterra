@@ -30,6 +30,6 @@ export default class ListCellOperationType extends Vue {
 
 <style lang="less" scoped>
 .cell {
-  font-size: 13pxf;
+  font-size: 13px;
 }
 </style>
