@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from "vue-property-decorator";
-import { ListViewMode } from "../../models/ListViewMode";
+import { ListViewMode } from "@/models/ListViewModels";
 @Component
 export default class ModeSelector extends Vue {
   @Prop({ type: Number, required: true })

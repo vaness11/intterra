@@ -17,7 +17,7 @@
           :key="operation.id + '_' + column.propertyName"
         >
           <component
-            :is="column.component"
+            :is="getComponent(column.propertyName)"
             :value="operation[column.propertyName]"
           />
         </td>
@@ -28,76 +28,17 @@
 
 <script lang="ts">
 import Operation from "@/models/Operation";
+import { ListSort, ListViewColumn } from "@/models/ListViewModels";
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import ListCellText from "./cells/ListCellText.vue";
 import ListCellDate from "./cells/ListCellDate.vue";
 import ListCellAssessment from "./cells/ListCellAssessment.vue";
 import ListCellOperationType from "./cells/ListCellOperationType.vue";
 
-enum ListSort {
-  None = 0,
-  Asc = 1,
-  Desc = -1
-}
-
-interface ListViewColumn {
-  propertyName: keyof Operation;
-  text: string;
-  component: unknown;
-  sort: ListSort;
-  sortFunc: (a: Operation, b: Operation) => number;
-}
-
 @Component
 export default class ListTable extends Vue {
-  columns: ListViewColumn[] = [
-    {
-      propertyName: "date",
-      text: "Дата",
-      component: ListCellDate,
-      sort: ListSort.None,
-      sortFunc(a, b) {
-        const x = a.date
-          ? new Date(a.date.year, a.date.month - 1, a.date.day)
-          : 0;
-        const y = b.date
-          ? new Date(b.date.year, b.date.month - 1, b.date.day)
-          : 0;
-        return x < y ? -1 : x > y ? 1 : 0;
-      }
-    },
-    {
-      propertyName: "type",
-      text: "Операция",
-      component: ListCellOperationType,
-      sort: ListSort.None,
-      sortFunc(a, b) {
-        return a.type < b.type ? -1 : a.type > b.type ? 1 : 0;
-      }
-    },
-    {
-      propertyName: "assessment",
-      text: "Качество",
-      component: ListCellAssessment,
-      sort: ListSort.None,
-      sortFunc(a, b) {
-        const x = a.assessment ?? 99;
-        const y = b.assessment ?? 99;
-        return x < y ? -1 : x > y ? 1 : 0;
-      }
-    },
-    {
-      propertyName: "comment",
-      text: "Комментарий",
-      component: ListCellText,
-      sort: ListSort.None,
-      sortFunc(a, b) {
-        const x = (a.comment || "").toLowerCase();
-        const y = (b.comment || "").toLowerCase();
-        return x < y ? -1 : x > y ? 1 : 0;
-      }
-    }
-  ];
+  @Prop({ type: Array, required: true })
+  columns!: ListViewColumn[];
 
   @Prop({ type: Array, required: true })
   operations!: Operation[];
@@ -115,6 +56,19 @@ export default class ListTable extends Vue {
   @Watch("operations")
   onOperationsChange() {
     this.resetSort();
+  }
+
+  getComponent(propertyName: keyof Operation) {
+    switch (propertyName) {
+      case "type":
+        return ListCellOperationType;
+      case "date":
+        return ListCellDate;
+      case "assessment":
+        return ListCellAssessment;
+      default:
+        return ListCellText;
+    }
   }
 
   getSortClass(col: ListViewColumn) {
