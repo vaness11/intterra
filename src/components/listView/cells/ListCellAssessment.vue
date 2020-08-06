@@ -47,6 +47,8 @@ export default class ListCellAssessment extends Vue {
     border-radius: 5px;
     width: 20px;
     height: 10px;
+    margin-right: 10px;
+    vertical-align: middle;
   }
 
   &.no-value .cell-text {
