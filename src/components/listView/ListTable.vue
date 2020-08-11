@@ -2,7 +2,7 @@
   <table class="list-table">
     <thead>
       <th
-        v-for="column in columns"
+        v-for="column in sortableColumns"
         :key="column.propertyName"
         :class="getSortClass(column)"
         @click="changeSort(column)"
@@ -13,7 +13,7 @@
     <tbody>
       <tr v-for="operation in sortedOperations" :key="operation.id">
         <td
-          v-for="column in columns"
+          v-for="column in sortableColumns"
           :key="operation.id + '_' + column.propertyName"
         >
           <component
@@ -28,7 +28,11 @@
 
 <script lang="ts">
 import Operation from "@/models/Operation";
-import { ListSort, ListViewColumn } from "@/models/ListViewModels";
+import {
+  ListSort,
+  ListViewColumn,
+  ListViewSortableColumn
+} from "@/models/ListViewModels";
 import { Vue, Component, Prop, Watch } from "vue-property-decorator";
 import ListCellText from "./cells/ListCellText.vue";
 import ListCellDate from "./cells/ListCellDate.vue";
@@ -40,6 +44,8 @@ export default class ListTable extends Vue {
   @Prop({ type: Array, required: true })
   columns!: ListViewColumn[];
 
+  sortableColumns: ListViewSortableColumn[] = [];
+
   @Prop({ type: Array, required: true })
   operations!: Operation[];
 
@@ -47,10 +53,23 @@ export default class ListTable extends Vue {
     if (!this.operations || !this.operations.length) return [];
 
     const ops = this.operations.slice(0); // copy
-    const column = this.columns.find(x => x.sort !== ListSort.None);
+    const column = this.sortableColumns.find(x => x.sort !== ListSort.None);
     if (column) ops.sort((a, b) => column.sortFunc(a, b) * column.sort);
 
     return ops;
+  }
+
+  @Watch("columns", { immediate: true })
+  onColumnsChange(value: ListViewColumn[]) {
+    if (!value || !value.length) return;
+
+    // or using Object.assign({ sort: ListSort.None, ...x })
+    this.sortableColumns = value.map(x => ({
+      propertyName: x.propertyName,
+      text: x.text,
+      sortFunc: x.sortFunc,
+      sort: ListSort.None
+    }));
   }
 
   @Watch("operations")
@@ -71,11 +90,11 @@ export default class ListTable extends Vue {
     }
   }
 
-  getSortClass(col: ListViewColumn) {
+  getSortClass(col: ListViewSortableColumn) {
     return "sort-" + ListSort[col.sort].toLowerCase();
   }
 
-  changeSort(col: ListViewColumn) {
+  changeSort(col: ListViewSortableColumn) {
     let sort = col.sort + 1;
     if (sort > ListSort.Asc) sort = ListSort.Desc;
 
@@ -85,7 +104,7 @@ export default class ListTable extends Vue {
   }
 
   resetSort() {
-    this.columns.forEach(x => (x.sort = ListSort.None));
+    this.sortableColumns.forEach(x => (x.sort = ListSort.None));
   }
 }
 </script>

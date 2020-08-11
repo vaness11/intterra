@@ -14,6 +14,9 @@ export enum ListSort {
 export interface ListViewColumn {
   propertyName: keyof Operation;
   text: string;
-  sort: ListSort;
   sortFunc: (a: Operation, b: Operation) => number;
+}
+
+export interface ListViewSortableColumn extends ListViewColumn {
+  sort: ListSort;
 }

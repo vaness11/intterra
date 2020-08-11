@@ -1,11 +1,10 @@
-import { ListViewColumn, ListSort } from "@/models/ListViewModels";
+import { ListViewColumn } from "@/models/ListViewModels";
 
 export default class ListViewService {
   private columns: ListViewColumn[] = [
     {
       propertyName: "date",
       text: "Дата",
-      sort: ListSort.None,
       sortFunc(a, b) {
         const x = a.date
           ? new Date(a.date.year, a.date.month - 1, a.date.day)
@@ -19,7 +18,6 @@ export default class ListViewService {
     {
       propertyName: "type",
       text: "Операция",
-      sort: ListSort.None,
       sortFunc(a, b) {
         return a.type < b.type ? -1 : a.type > b.type ? 1 : 0;
       }
@@ -27,7 +25,6 @@ export default class ListViewService {
     {
       propertyName: "assessment",
       text: "Качество",
-      sort: ListSort.None,
       sortFunc(a, b) {
         const x = a.assessment ?? 99;
         const y = b.assessment ?? 99;
@@ -37,7 +34,6 @@ export default class ListViewService {
     {
       propertyName: "comment",
       text: "Комментарий",
-      sort: ListSort.None,
       sortFunc(a, b) {
         const x = (a.comment || "").toLowerCase();
         const y = (b.comment || "").toLowerCase();
